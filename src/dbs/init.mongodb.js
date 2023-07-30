@@ -1,9 +1,14 @@
 "use strict";
 // ! Apply singleton Pattern to Connect DB
 const mongoose = require("mongoose");
-const { countConnect } = require("../helpers/check.connect");
+// const { countConnect } = require("../helpers/check.connect");
+const {
+  DB_NAME,
+  DB_PASSWORD,
+  CLUSTER_NAME,
+} = require("../configs/config.mongodb");
 
-const connectString = `mongodb+srv://vomanhdat10998:manhdat10998@shopdevcluster.voq8xha.mongodb.net/`;
+const connectString = `mongodb+srv://${DB_NAME}:${DB_PASSWORD}@${CLUSTER_NAME}.voq8xha.mongodb.net/`;
 
 class Database {
   constructor() {

@@ -3,10 +3,11 @@ const express = require("express");
 const morgan = require("morgan");
 const { default: helmet } = require("helmet");
 const compression = require("compression");
-
+const rootRouter = require("./routes/root.router");
 const app = express();
 
 // * init middlewares
+app.use(express.json());
 app.use(morgan("dev"));
 app.use(helmet());
 app.use(compression());
@@ -15,15 +16,13 @@ app.use(compression());
 require("./dbs/init.mongodb");
 
 // * Test How many Request in DB
-const { countConnect, checkOverload } = require("./helpers/check.connect");
+const { countConnect } = require("./helpers/check.connect");
 
 countConnect();
 // checkOverload();
 
 // * init Router
-app.get("/", (req, res, next) => {
-  return res.status(200).json("hello world");
-});
+app.use("/v1/api", rootRouter);
 
 // * handle Error
 

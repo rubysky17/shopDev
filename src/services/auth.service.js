@@ -75,16 +75,15 @@ class AuthService {
 
       // console.log("Create Tokens Susscess::", tokens);
 
-      return {
-        code: 201,
-        metadata: {
-          shop: utils.getInfoData({
-            fields: ["_id", "name", "email"],
-            object: newShop,
-          }),
-          tokens,
-        },
+      const shopResult = {
+        shop: utils.getInfoData({
+          fields: ["_id", "name", "email"],
+          object: newShop,
+        }),
+        tokens,
       };
+
+      return shopResult;
     }
 
     return {

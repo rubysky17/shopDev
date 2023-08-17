@@ -8,7 +8,7 @@ const DOCUMENT_NAME = "Shop"; // ! Document name sẽ không có 's'
 const { Schema } = mongoose;
 
 // Declare the Schema of the Mongo model
-var shopSchema = new mongoose.Schema(
+let shopSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -44,5 +44,20 @@ var shopSchema = new mongoose.Schema(
   }
 );
 
-//Export the model
-module.exports = mongoose.model(DOCUMENT_NAME, shopSchema);
+shopSchema.statics.findByEmail = async ({
+  email,
+  select = {
+    emmail: 1,
+    password: 2,
+    name: 1,
+    status: 1,
+    roles: 1,
+  },
+}) => {
+  return await Shop.findOne({email}).select(select).lean();
+};
+
+// Export the model
+const Shop =  mongoose.model(DOCUMENT_NAME, shopSchema);
+
+module.exports = Shop

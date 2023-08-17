@@ -7,8 +7,6 @@ const { asyncHandler } = require("../auth/checkAuth.utils");
 authRouter.post("/signup", asyncHandler(AuthController.signUp));
 
 // ! [POST]: Đăng nhập
-authRouter.post("/signin", (req, res, next) => {
-  return res.status(200).json("hello world");
-});
+authRouter.post("/signin", asyncHandler(AuthController.login));
 
 module.exports = authRouter;

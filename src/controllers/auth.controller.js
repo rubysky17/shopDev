@@ -11,6 +11,16 @@ class AuthController {
       },
     }).send(res);
   };
+
+  login = async (req, res, next) => {
+    new OK({
+      message: "Login OK!",
+      metadata: await AuthService.login(req.body),
+      options: {
+        limit: 10,
+      },
+    }).send(res);
+  };
 }
 
 module.exports = new AuthController();

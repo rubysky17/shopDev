@@ -135,8 +135,6 @@ class AuthService {
         privateKey
       );
 
-      // console.log("Create Tokens Susscess::", tokens);
-
       const shopResult = {
         shop: utils.getInfoData({
           fields: ["_id", "name", "email"],
@@ -152,6 +150,10 @@ class AuthService {
       code: 200,
       metadata: null,
     };
+  };
+
+  static logout = async (keyStore) => {
+    const user = await KeyTokenService.removeToken(keyStore);
   };
 }
 

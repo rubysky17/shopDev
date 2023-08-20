@@ -3,7 +3,12 @@
 const keyModel = require("../models/keytoken.model");
 
 class KeyTokenService {
-  static generateToken = async ({ shopId, publicKey, privateKey , refreshToken}) => {
+  static generateToken = async ({
+    shopId,
+    publicKey,
+    privateKey,
+    refreshToken,
+  }) => {
     try {
       // level 0
       // const publicKeyString = publicKey.toString();
@@ -36,6 +41,10 @@ class KeyTokenService {
         status: "error",
       };
     }
+  };
+
+  static removeToken = async (keyStore) => {
+    return await keyModel.removeById(keyStore._id);
   };
 }
 

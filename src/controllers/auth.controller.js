@@ -21,6 +21,16 @@ class AuthController {
       },
     }).send(res);
   };
+
+  logout = async (req, res, next) => {
+    new OK({
+      message: "Logout OK!",
+      metadata: await AuthService.logout(req.keyStore),
+      options: {
+        limit: 10,
+      },
+    }).send(res);
+  };
 }
 
 module.exports = new AuthController();

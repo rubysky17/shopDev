@@ -79,8 +79,6 @@ const authentication = asyncHandler(async (req, res, next) => {
   } catch (error) {
     throw new AuthFailureError("Token not verify correctly");
   }
-
-  next();
 });
 
 module.exports = {

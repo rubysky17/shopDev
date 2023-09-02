@@ -153,7 +153,7 @@ class AuthService {
   };
 
   static logout = async (keyStore) => {
-    const user = await KeyTokenService.removeToken(keyStore);
+    return await KeyTokenService.removeToken(keyStore);
   };
 }
 

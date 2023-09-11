@@ -3,12 +3,13 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const ROLES = require("../constants/roles.constant");
 const KeyTokenService = require("./keyToken.service");
-const { createTokensPair } = require("../auth/auth.utils");
+const { createTokensPair, verifyJWT } = require("../auth/auth.utils");
 
 const utils = require("../utils");
 const {
   ConflictRequestError,
   AuthFailureError,
+  ForbiddenError,
 } = require("../core/error.response");
 
 const SALTS_VALUE = 10; // The Difficult of Value to Handle
@@ -30,6 +31,11 @@ const SALTS_VALUE = 10; // The Difficult of Value to Handle
  * B4: Tạo ra tokens
  * B5: lấy data user và trả về thông tin cho người dùng
  */
+
+// ** Workflow check Token đã được sử dụng
+// B1: Kiểm tra RT đó có tồn tại trong token used hay không ?
+// B2: Có => xoá hết thông tin user trong tokenModel
+// B3: không => tạo ra 1 cặp token mới và lưu RT vào list Token used
 
 class AuthService {
   static login = async ({ email, password, refreshToken }) => {
@@ -154,6 +160,64 @@ class AuthService {
 
   static logout = async (keyStore) => {
     return await KeyTokenService.removeToken(keyStore);
+  };
+
+  static handleRefreshToken = async (refreshToken) => {
+    const foundToken =
+      await KeyTokenService.findByRefreshTokenUsed(refreshToken);
+
+    if (foundToken) {
+      // Decode
+      const { userId, email } = await verifyJWT(
+        refreshToken,
+        foundToken.privateKey
+      );
+
+      console.log("case founded", userId, email);
+
+      await KeyTokenService.deleteById(userId);
+
+      throw new ForbiddenError("Something went wrong");
+    }
+
+    const holderToken = await KeyTokenService.findByRefreshToken(refreshToken);
+
+    if (!holderToken) throw new AuthFailureError("Not find holderToken");
+
+    const { userId, email } = await verifyJWT(
+      refreshToken,
+      holderToken.privateKey
+    );
+
+    const foundUser = await shopModel.findByEmail({ email });
+
+    if (!foundUser) throw new AuthFailureError("Not find by Email");
+
+    const tokens = await createTokensPair(
+      {
+        userId,
+        email,
+      },
+      holderToken.publicKey,
+      holderToken.privateKey
+    );
+    console.log({
+      holderToken,
+    });
+    // Save Token used
+    await holderToken.updateOne({
+      $set: {
+        refreshToken: tokens.refreshToken,
+      },
+      $addToSet: {
+        refreshTokensUsed: refreshToken,
+      },
+    });
+
+    return {
+      user: { userId, email },
+      tokens,
+    };
   };
 }
 

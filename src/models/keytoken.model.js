@@ -43,6 +43,13 @@ keytokenSchema.statics.removeById = async (id) => {
   return await Keytoken.findOneAndRemove(id);
 };
 
+keytokenSchema.statics.findByRefreshTokenUsed = async (refreshToken) => {
+  return await Keytoken.findOne({ refreshTokensUsed: refreshToken }).lean();
+};
+keytokenSchema.statics.findByRefreshToken = async (refreshToken) => {
+  return await Keytoken.findOne({ refreshToken });
+};
+
 const Keytoken = mongoose.model(DOCUMENT_NAME, keytokenSchema);
 
 //Export the model

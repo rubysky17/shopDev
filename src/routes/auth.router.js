@@ -14,5 +14,9 @@ authRouter.use(authentication);
 
 // ! [POST]: Đăng xuất
 authRouter.post("/logout", asyncHandler(AuthController.logout));
+authRouter.post(
+  "/handleRefreshToken",
+  asyncHandler(AuthController.handleRefreshToken)
+);
 
 module.exports = authRouter;

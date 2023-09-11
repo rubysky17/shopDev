@@ -47,17 +47,17 @@ let shopSchema = new mongoose.Schema(
 shopSchema.statics.findByEmail = async ({
   email,
   select = {
-    emmail: 1,
+    email: 1,
     password: 2,
     name: 1,
     status: 1,
     roles: 1,
   },
 }) => {
-  return await Shop.findOne({email}).select(select).lean();
+  return await Shop.findOne({ email }).select(select).lean();
 };
 
 // Export the model
-const Shop =  mongoose.model(DOCUMENT_NAME, shopSchema);
+const Shop = mongoose.model(DOCUMENT_NAME, shopSchema);
 
-module.exports = Shop
+module.exports = Shop;

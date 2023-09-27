@@ -1,6 +1,7 @@
 const rootRouter = require("express").Router();
 const shopRouter = require("./shop.router");
 const authRouter = require("./auth.router");
+const productRouter = require("./product.router");
 
 // const { apiKey, permission } = require("../auth/checkAuth.utils");
 
@@ -9,5 +10,6 @@ const authRouter = require("./auth.router");
 
 rootRouter.use("/shop", shopRouter);
 rootRouter.use("/auth", authRouter);
+rootRouter.use("/products", productRouter);
 
 module.exports = rootRouter;

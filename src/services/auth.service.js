@@ -173,8 +173,6 @@ class AuthService {
         foundToken.privateKey
       );
 
-      console.log("case founded", userId, email);
-
       await KeyTokenService.deleteById(userId);
 
       throw new ForbiddenError("Something went wrong");
@@ -201,9 +199,7 @@ class AuthService {
       holderToken.publicKey,
       holderToken.privateKey
     );
-    console.log({
-      holderToken,
-    });
+
     // Save Token used
     await holderToken.updateOne({
       $set: {

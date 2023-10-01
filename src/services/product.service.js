@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * ? Workflow như sau:
+ * Nhận payload của 1 sản phẩm cần tạo => tạo category với _id = 1 sau đó lây _id = 1 đó của category gán vào cho sản phẩm luôn vậy sản phẩm sẽ có _id trùng với _id của category
+ */
 
 const {
   Product: ProductModel,
@@ -51,8 +55,11 @@ class Product {
   }
 
   // ? Create new Product
-  async createProduct() {
-    return await ProductModel.create(this);
+  async createProduct(product_id) {
+    return await ProductModel.create({
+      ...this,
+      _id: product_id,
+    });
   }
 }
 
@@ -60,13 +67,16 @@ class Product {
 // ! VD: clothing
 class Clothing extends Product {
   async createProduct() {
-    const newClothing = await ClothingModel.create(this.product_attributes);
+    const newClothing = await ClothingModel.create({
+      ...this.product_attributes,
+      product_shop: this.product_shop,
+    });
 
     if (!newClothing) {
       throw new BadRequestError("Create new Clothing Error");
     }
 
-    const newProduct = await super.createProduct();
+    const newProduct = await super.createProduct(newClothing._id);
 
     if (!newProduct) {
       throw new BadRequestError("Create new Product Error");
@@ -78,14 +88,16 @@ class Clothing extends Product {
 
 class Electronics extends Product {
   async createProduct() {
-    console.log("create createProduct");
-    const newClothing = await ElectronicModel.create(this.product_attributes);
+    const newElectronic = await ElectronicModel.create({
+      ...this.product_attributes,
+      product_shop: this.product_shop,
+    });
 
-    if (!newClothing) {
+    if (!newElectronic) {
       throw new BadRequestError("Create new Eletronic Error");
     }
 
-    const newProduct = await super.createProduct();
+    const newProduct = await super.createProduct(newElectronic._id);
 
     if (!newProduct) {
       throw new BadRequestError("Create new Product Error");

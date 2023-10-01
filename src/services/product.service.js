@@ -18,18 +18,32 @@ class ProductFactory {
    * Payload
    */
 
-  static async createProduct(type, payload) {
-    switch (type) {
-      case "Clothing":
-        return new Clothing(payload).createProduct();
+  static productRegistry = {};
 
-      case "Electronics":
-        return new Electronics(payload).createProduct();
-
-      default:
-        throw new BadRequestError(`Invalid product type: ${type}`);
-    }
+  static registryProductType(type, classRef) {
+    ProductFactory.productRegistry[type] = classRef;
   }
+
+  static createProduct(type, payload) {
+    const productClass = ProductFactory.productRegistry[type];
+
+    if (!productClass)
+      throw new BadRequestError(`Invalid product type: ${type}`);
+
+    return new productClass(payload).createProduct();
+  }
+
+  // * without Stategy Pattern
+  // static async createProduct(type, payload) {
+  //   switch (type) {
+  //     case "Clothing":
+  //       return new Clothing(payload).createProduct();
+  //     case "Electronics":
+  //       return new Electronics(payload).createProduct();
+  //     default:
+  //       throw new BadRequestError(`Invalid product type: ${type}`);
+  //   }
+  // }
 }
 
 // Định nghĩa 1 product class
@@ -65,7 +79,7 @@ class Product {
 
 // ! Defined sub-class cho cho những product type khác nhau
 // ! VD: clothing
-class Clothing extends Product {
+class Clothings extends Product {
   async createProduct() {
     const newClothing = await ClothingModel.create({
       ...this.product_attributes,
@@ -106,5 +120,31 @@ class Electronics extends Product {
     return newProduct;
   }
 }
+
+class Furniture extends Product {
+  async createProduct() {
+    const newFurniture = await ClothingModel.create({
+      ...this.product_attributes,
+      product_shop: this.product_shop,
+    });
+
+    if (!newFurniture) {
+      throw new BadRequestError("Create new furniture Error");
+    }
+
+    const newProduct = await super.createProduct(newFurniture._id);
+
+    if (!newProduct) {
+      throw new BadRequestError("Create new Product Error");
+    }
+
+    return newProduct;
+  }
+}
+
+// * Register Product Type
+ProductFactory.registryProductType("Clothings", Clothings);
+ProductFactory.registryProductType("Electronics", Electronics);
+ProductFactory.registryProductType("Furniture", Furniture);
 
 module.exports = ProductFactory;

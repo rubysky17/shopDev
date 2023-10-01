@@ -12,6 +12,14 @@ const {
 
 const { BadRequestError } = require("../core/error.response");
 
+const {
+  findAllDraftsForShop,
+  publishProductByShop,
+  findAllPublishForShop,
+  unPublishProductByShop,
+  searchProductsByUser,
+} = require("../models/repositories/product.repo");
+
 class ProductFactory {
   /**
    * Type: 'Clothing'
@@ -44,6 +52,70 @@ class ProductFactory {
   //       throw new BadRequestError(`Invalid product type: ${type}`);
   //   }
   // }
+
+  /**
+   * @Function Tìm tất cả các sản phẩm có trạng thái là Nháp
+   * @Params product_shop: id shop cần lấy
+   * @Params skip: Số trang
+   * @Params limit: giới hạn item cần lấy
+   */
+  static async findAllDraftsForShop({ product_shop, skip = 0, limit = 20 }) {
+    const query = {
+      product_shop,
+      isDraft: true,
+    };
+
+    return await findAllDraftsForShop({ query, limit, skip });
+  }
+
+  /**
+   * @Function Tìm tất cả các sản phẩm có trạng thái là Published
+   * @Params product_shop: id shop cần lấy
+   * @Params skip: Số trang
+   * @Params limit: giới hạn item cần lấy
+   */
+  static async findAllPublishForShop({ product_shop, skip = 0, limit = 20 }) {
+    const query = {
+      product_shop,
+      isDraft: false,
+    };
+
+    return await findAllPublishForShop({ query, limit, skip });
+  }
+
+  /**
+   * @Function Cập nhật Product thành publish
+   * @Params product_shop: id shop cần lấy
+   * @Params product_id: id product cần đổi tên
+   */
+  static async publishProductByShop({ product_shop, product_id }) {
+    return await publishProductByShop({
+      product_shop,
+      product_id,
+    });
+  }
+
+  /**
+   * @Function Cập nhật Product thành draft
+   * @Params product_shop: id shop cần lấy
+   * @Params product_id: id product cần đổi tên
+   */
+  static async unPublishProductByShop({ product_shop, product_id }) {
+    return await unPublishProductByShop({
+      product_shop,
+      product_id,
+    });
+  }
+
+  /**
+   * @Function Tìm kiếm sản phẩm
+   * @Params keyword
+   */
+  static async searchProductsByUser({ keyword }) {
+    return await searchProductsByUser({
+      keyword,
+    });
+  }
 }
 
 // Định nghĩa 1 product class

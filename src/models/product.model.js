@@ -5,6 +5,8 @@ const mongoose = require("mongoose"); // Erase if already required
 const COLLECTION_NAME = "Products"; // ! Collection sẽ có 's'
 const DOCUMENT_NAME = "Product"; // ! Document name sẽ không có 's'
 
+const slugify = require("slugify");
+
 const { Schema } = mongoose;
 
 // Declare the Schema of the Mongo model
@@ -17,6 +19,9 @@ let productSchema = new mongoose.Schema(
     product_thumb: {
       type: String,
       required: true,
+    },
+    product_slug: {
+      type: String,
     },
     product_description: {
       type: String,
@@ -33,7 +38,7 @@ let productSchema = new mongoose.Schema(
       // ? Cai này sẽ mở rộng thêm 1 bảng collection để get type product
       type: String,
       required: true,
-      enum: ["Electronics", "Clothing", "Furniture"],
+      enum: ["Electronics", "Clothings", "Furnitures"],
     },
     product_shop: {
       type: Schema.Types.ObjectId,
@@ -43,12 +48,51 @@ let productSchema = new mongoose.Schema(
       type: Schema.Types.Mixed,
       required: true,
     },
+    product_ratingsAverage: {
+      type: Number,
+      default: 4.5,
+      min: [1, "Rating must be above 1.0"],
+      max: [5, "Rating must be under 5.0"],
+      set: (value) => Math.round(value * 10) / 10,
+    },
+    product_variations: {
+      type: Array,
+      default: [],
+    },
+    isDraft: {
+      type: Boolean,
+      default: true,
+      index: true,
+      select: false,
+    },
+    isPublished: {
+      type: Boolean,
+      default: false,
+      index: true,
+      select: false,
+    },
   },
   {
     timestamps: true,
     collection: COLLECTION_NAME,
   }
 );
+
+// ! hàm pre này cho phép trước khi document được save nó sẽ chạy
+// * Câu hỏi đặt ra tại sao không cấu hình nó ở trong service luôn => thì cấu hình ở chỗ này nó sẽ clean code hơn
+productSchema.pre("save", function (next) {
+  this.product_slug = slugify(this.product_name, {
+    lower: true,
+  });
+
+  next();
+});
+
+// ! Đánh index cho search
+productSchema.index({
+  product_name: "text",
+  product_description: "text",
+});
 
 let clothingSchema = new mongoose.Schema(
   {

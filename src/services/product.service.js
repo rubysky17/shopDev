@@ -18,6 +18,8 @@ const {
   findAllPublishForShop,
   unPublishProductByShop,
   searchProductsByUser,
+  findAllProducts,
+  findProduct,
 } = require("../models/repositories/product.repo");
 
 class ProductFactory {
@@ -114,6 +116,39 @@ class ProductFactory {
   static async searchProductsByUser({ keyword }) {
     return await searchProductsByUser({
       keyword,
+    });
+  }
+
+  /**
+   * @Function tìm kiếm tất cả sản phẩm
+   * @Params
+   */
+  static async findAllProducts({
+    limit = 50,
+    sort = "ctime",
+    page = 1,
+    filter = {
+      isPublished: true,
+    },
+    select = ["product_name", "product_price", "product_thumb"],
+  }) {
+    return await findAllProducts({
+      limit,
+      sort,
+      page,
+      filter,
+      select,
+    });
+  }
+
+  /**
+   * @Function tìm kiếm sản phẩm
+   * @Params product_id
+   */
+  static async findProduct({ product_id, unSelect = ["__v"] }) {
+    return await findProduct({
+      product_id,
+      unSelect,
     });
   }
 }

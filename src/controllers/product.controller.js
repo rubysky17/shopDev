@@ -1,6 +1,6 @@
 const ProductService = require("../services/product.service");
 
-const { CREATED, OK } = require("../core/success.response");
+const { CREATED, OK, UPDATED } = require("../core/success.response");
 
 class ProductController {
   createProduct = async (req, res, next) => {
@@ -13,6 +13,20 @@ class ProductController {
       options: {
         limit: 10,
       },
+    }).send(res);
+  };
+
+  updateProduct = async (req, res, next) => {
+    new UPDATED({
+      message: "Update product success!",
+      metadata: await ProductService.updateProduct(
+        req.body.product_type,
+        req.params.product_id,
+        {
+          ...req.body,
+          product_shop: req.keyStore.user,
+        }
+      ),
     }).send(res);
   };
 

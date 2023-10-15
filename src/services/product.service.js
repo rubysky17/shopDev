@@ -8,9 +8,12 @@ const {
   Product: ProductModel,
   Clothing: ClothingModel,
   Electronic: ElectronicModel,
+  Furniture: FurnitureModel,
 } = require("../models/product.model");
 
 const { BadRequestError } = require("../core/error.response");
+
+const { removeUndefinedObject, updateNestedObjectParser } = require("../utils");
 
 const {
   findAllDraftsForShop,
@@ -20,14 +23,10 @@ const {
   searchProductsByUser,
   findAllProducts,
   findProduct,
+  updateProductById,
 } = require("../models/repositories/product.repo");
 
 class ProductFactory {
-  /**
-   * Type: 'Clothing'
-   * Payload
-   */
-
   static productRegistry = {};
 
   static registryProductType(type, classRef) {
@@ -41,6 +40,22 @@ class ProductFactory {
       throw new BadRequestError(`Invalid product type: ${type}`);
 
     return new productClass(payload).createProduct();
+  }
+  /**
+   * @function: Cập nhật sản phẩm
+   * @note Do khi cập nhật SP sẽ có thể có TH cập nhật attribute nên sẽ update cả 2 luôn
+   * @param {*} type
+   * @param {*} product_id
+   * @param {*} payload
+   * @returns
+   */
+  static updateProduct(type, product_id, payload) {
+    const productClass = ProductFactory.productRegistry[type];
+
+    if (!productClass)
+      throw new BadRequestError(`Invalid product type: ${type}`);
+
+    return new productClass(payload).updateProduct(product_id);
   }
 
   // * without Stategy Pattern
@@ -182,6 +197,15 @@ class Product {
       _id: product_id,
     });
   }
+
+  // ? update Product
+  async updateProduct({ product_id, payload }) {
+    return await updateProductById({
+      product_id,
+      payload,
+      model: ProductModel,
+    });
+  }
 }
 
 // ! Defined sub-class cho cho những product type khác nhau
@@ -204,6 +228,27 @@ class Clothings extends Product {
     }
 
     return newProduct;
+  }
+
+  async updateProduct(product_id) {
+    // ! 1. Hàm remove những attribute có giá trị null hoặc undefined
+    // ! 2. Check xem update ở chỗ nào ?
+    const updateNested = removeUndefinedObject(this);
+
+    if (updateNested.product_attributes) {
+      await updateProductById({
+        product_id,
+        payload: updateNestedObjectParser(updateNested.product_attributes),
+        model: ClothingModel,
+      });
+    }
+
+    const updateProduct = await super.updateProduct({
+      product_id,
+      payload: updateNestedObjectParser(updateNested),
+    });
+
+    return updateProduct;
   }
 }
 
@@ -230,7 +275,7 @@ class Electronics extends Product {
 
 class Furniture extends Product {
   async createProduct() {
-    const newFurniture = await ClothingModel.create({
+    const newFurniture = await FurnitureModel.create({
       ...this.product_attributes,
       product_shop: this.product_shop,
     });

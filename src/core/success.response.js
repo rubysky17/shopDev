@@ -38,7 +38,20 @@ class CREATED extends SuccessResponse {
   }
 }
 
+class UPDATED extends SuccessResponse {
+  constructor({
+    message,
+    statusCode = StatusCodes.UPDATED,
+    reasonStatusCode = ReasonPhrases.UPDATED,
+    metadata,
+    options = {},
+  }) {
+    super({ message, statusCode, reasonStatusCode, metadata, options });
+  }
+}
+
 module.exports = {
   CREATED,
   OK,
+  UPDATED,
 };

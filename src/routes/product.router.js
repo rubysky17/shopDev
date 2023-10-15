@@ -10,6 +10,12 @@ productRouter.get(
   asyncHandler(ProductController.searchProductsByUser)
 );
 
+// ! [GET]: Lấy tất cả sản phẩm
+productRouter.get("/", asyncHandler(ProductController.findAllProducts));
+
+// ! [GET]: Lấy chi tiết sản phẩm
+productRouter.get("/:product_id", asyncHandler(ProductController.findProduct));
+
 productRouter.use(authentication);
 
 // ! [POST]: Tạo sản phẩm

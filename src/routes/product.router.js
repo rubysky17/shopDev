@@ -21,6 +21,12 @@ productRouter.use(authentication);
 // ! [POST]: Tạo sản phẩm
 productRouter.post("/", asyncHandler(ProductController.createProduct));
 
+// ! [PATCH]: Sửa sản phẩm
+productRouter.patch(
+  "/:product_id",
+  asyncHandler(ProductController.updateProduct)
+);
+
 // ! [PUT]: Publish sản phẩm
 productRouter.put(
   "/published/:id",

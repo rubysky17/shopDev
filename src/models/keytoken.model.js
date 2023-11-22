@@ -20,9 +20,13 @@ let keytokenSchema = new Schema(
       type: String,
       required: true,
     },
-    refreshToken: {
+    refreshTokensUsed: {
       type: Array,
       default: [],
+    },
+    refreshToken: {
+      type: String,
+      required: true,
     },
   },
   {
@@ -31,5 +35,15 @@ let keytokenSchema = new Schema(
   }
 );
 
+keytokenSchema.statics.findByUser = async ({ userId }) => {
+  return await Keytoken.findOne({ user: userId }).lean();
+};
+
+keytokenSchema.statics.removeById = async (id) => {
+  return await Keytoken.findOneAndRemove(id);
+};
+
+const Keytoken = mongoose.model(DOCUMENT_NAME, keytokenSchema);
+
 //Export the model
-module.exports = model(DOCUMENT_NAME, keytokenSchema);
+module.exports = Keytoken;

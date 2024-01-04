@@ -3,12 +3,11 @@
 const mongoose = require("mongoose");
 // const { countConnect } = require("../helpers/check.connect");
 const {
-  DB_NAME,
-  DB_PASSWORD,
-  CLUSTER_NAME,
+  PORT_MONGODB,
+  NAME_DB,
 } = require("../configs/config.mongodb");
 
-const connectString = `mongodb+srv://${DB_NAME}:${DB_PASSWORD}@${CLUSTER_NAME}.voq8xha.mongodb.net/`;
+const connectString = `${PORT_MONGODB}/${NAME_DB}`;
 
 class Database {
   constructor() {

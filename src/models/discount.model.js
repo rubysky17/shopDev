@@ -20,7 +20,8 @@ let discountSchema = new Schema(
 
     discount_is_active: { type: Boolean, default: true },
     discount_applies_to: { type: String, required: true, enum: ['all', 'specific'] },// áp dụng cho { toàn bộ sp hay 1 số SP}
-    discount_product_ids: { type: Array, default: [] } // SP nào được áp dụng
+    discount_product_ids: { type: Array, default: [] }, // SP nào được áp dụng
+    discount_max_uses: { type: Number, default: 0 } // Số lượng discount được sử dụng tối đa
   },
   {
     timestamps: true,

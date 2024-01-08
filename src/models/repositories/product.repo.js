@@ -94,7 +94,7 @@ const findAllProducts = async ({ limit, sort, page, filter, select }) => {
     .limit(limit)
     .select(getSelectDate(select))
     .lean();
-
+  console.log("findAllProducts", { products })
   return products;
 };
 

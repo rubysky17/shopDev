@@ -3,6 +3,7 @@ const shopRouter = require("./shop.router");
 const authRouter = require("./auth.router");
 const productRouter = require("./product.router");
 const discountRouter = require("./discount.router");
+const cartRouter = require("./cart.router");
 
 // const { apiKey, permission } = require("../auth/checkAuth.utils");
 
@@ -12,6 +13,7 @@ const discountRouter = require("./discount.router");
 rootRouter.use("/shop", shopRouter);
 rootRouter.use("/auth", authRouter);
 rootRouter.use("/products", productRouter);
-rootRouter.use("/discount", discountRouter)
+rootRouter.use("/cart", cartRouter);
+rootRouter.use("/discount", discountRouter);
 
 module.exports = rootRouter;

@@ -1,5 +1,9 @@
 'use strict'
+const { NotFoundError } = require("../core/error.response");
 const cartModel = require("../models/cart.model");
+const { findProduct } = require("../models/repositories/product.repo")
+const { convertToObjectIdMongodb } = require("../utils");
+
 /**
  * Key features: Cart Services
  * - add product to cart
@@ -31,16 +35,15 @@ class CartService {
         return await cartModel.findOneAndUpdate(query, updateOrInsert, options)
     }
 
-
     static async updateQuantity(payload) {
-        const { userId, product = {} } = payload;
-        const { productId, product_quantity } = product
+        const { userId, product } = payload;
+        const { productId, quantity } = product
 
         const query = { cart_userId: userId, "cart_products.productId": productId, cart_state: "active" };
 
         const updateSet = {
             $inc: {
-                'cart_products.$.quantity': product_quantity
+                'cart_products.$.quantity': +quantity
             }
         };
 
@@ -51,6 +54,34 @@ class CartService {
 
         return await cartModel.findOneAndUpdate(query, updateSet, options)
     }
+
+    static async deleteCartItem(payload) {
+        const { userId, productId } = payload;
+
+        const query = {
+            cart_userId: userId,
+            cart_state: 'active'
+        };
+
+        const updateSet = {
+            $pull: {
+                cart_products: {
+                    productId
+                }
+            }
+        }
+
+        const deleteCartItem = await cartModel.updateOne(query, updateSet)
+
+        return deleteCartItem
+    }
+
+    static async getToCart(payload) {
+        return await cartModel.findOne({
+            cart_userId: parseInt(payload.userId)
+        }).lean();
+    }
+
 
     // END REPO SERVICE
     static async addToCart(payload) {
@@ -63,7 +94,7 @@ class CartService {
 
         if (!userCart) {
             // create cart for user
-            return await CartService.addToCart({
+            return await CartService.createUserCart({
                 userId,
                 product
             })
@@ -80,9 +111,62 @@ class CartService {
         return await CartService.updateQuantity({
             userId,
             product
-        })
-
+        });
     }
+
+
+    /**
+     * Example Payload
+     * shop_order_ids: 
+     *  {
+     *      shopId,
+     *      item_products: [
+     *          {
+     *              quantity,
+     *              price,
+     *              shopId,
+     *              old_quantity,
+     *              productId
+     *          }
+     *      ]
+     *  }
+     * 
+     */
+    static async addToCartV2(payload) {
+        const { userId, shop_order_id } = payload;
+        const { quantity, productId } = shop_order_id.item_products[0];
+
+        // ! Tìm kiếm Product theo Id
+        const foundProduct = await findProduct({
+            product_id: convertToObjectIdMongodb(productId)
+        });
+
+        if (!foundProduct) throw new NotFoundError("Không tìm thấy sản phẩm");
+
+        // ! Trường hợp: Product trong giỏ hàng có shopId khác với Product shopId tìm được (product khác shop)
+
+        // ! Trường hợp: số lượng bằng = 0 => xoá sp ra khỏi giỏ hàng
+        if (!quantity) {
+            return await CartService.deleteCartItem({
+                userId,
+                productId
+            })
+        }
+
+        // ! Trường hợp: quantity không khả dụng (nhỏ hơn hàng trong kho)
+        if (foundProduct.product_quantity < +quantity) {
+            throw new NotFoundError("Vượt quá số lượng hàng có thể bán");
+        }
+
+        // ! Trường hợp: SP đó đã tồn tại thì update
+        // ! Trường hợp: SP đó chưa tồn tại thì thêm vào
+        return await CartService.createUserCart({
+            userId,
+            product: shop_order_id.item_products[0]
+        })
+    }
+
+
 }
 
 module.exports = CartService;

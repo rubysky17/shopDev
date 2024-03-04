@@ -1,4 +1,4 @@
-const { Schema, model } = required("mongoose");
+const { Schema, model } = require("mongoose");
 
 const COLLECTION_NAME = "Carts";
 const DOCUMENT_NAME = "Cart";
@@ -6,7 +6,7 @@ const DOCUMENT_NAME = "Cart";
 let cartschema = new Schema(
     {
         cart_state: {
-            type: string,
+            type: String,
             required: true,
             enum: ['active', 'complete', 'failed', 'pending'],
             default: "active"

@@ -55,26 +55,6 @@ class CartService {
         return await cartModel.findOneAndUpdate(query, updateSet, options)
     }
 
-    static async deleteCartItem(payload) {
-        const { userId, productId } = payload;
-
-        const query = {
-            cart_userId: userId,
-            cart_state: 'active'
-        };
-
-        const updateSet = {
-            $pull: {
-                cart_products: {
-                    productId
-                }
-            }
-        }
-
-        const deleteCartItem = await cartModel.updateOne(query, updateSet)
-
-        return deleteCartItem
-    }
 
     static async getToCart(payload) {
         return await cartModel.findOne({
@@ -107,11 +87,29 @@ class CartService {
             return await userCart.save();
         }
 
-        // ! Nếu có giỏ hàng và có sản phẩm trùng thì update số lượng lên 
-        return await CartService.updateQuantity({
-            userId,
-            product
-        });
+        const productIsExist = userCart.cart_products.findIndex(y => y.productId === product.productId) !== -1
+
+        if (productIsExist) {
+            // ! Nếu có giỏ hàng và có sản phẩm trùng thì update số lượng lên 
+            return await CartService.updateQuantity({
+                userId,
+                product
+            });
+        } else {
+            let newProducts = [...userCart.cart_products]
+            newProducts.push(product)
+
+            userCart.cart_products = newProducts;
+
+            return await userCart.save();
+        }
+
+        console.log({
+            userCart
+        })
+
+
+
     }
 
 
@@ -133,8 +131,9 @@ class CartService {
      * 
      */
     static async addToCartV2(payload) {
-        const { userId, shop_order_id } = payload;
-        const { quantity, productId } = shop_order_id.item_products[0];
+        const { userId, shop_order_ids } = payload;
+
+        const { quantity, old_quantity, productId } = shop_order_ids[0]?.item_products[0];
 
         // ! Tìm kiếm Product theo Id
         const foundProduct = await findProduct({
@@ -160,12 +159,35 @@ class CartService {
 
         // ! Trường hợp: SP đó đã tồn tại thì update
         // ! Trường hợp: SP đó chưa tồn tại thì thêm vào
-        return await CartService.createUserCart({
+        return await CartService.updateQuantity({
             userId,
-            product: shop_order_id.item_products[0]
+            product: {
+                productId,
+                quantity: quantity - old_quantity
+            }
         })
     }
 
+    static async deleteCartItem(payload) {
+        const { userId, productId } = payload;
+
+        const query = {
+            cart_userId: userId,
+            cart_state: 'active'
+        };
+
+        const updateSet = {
+            $pull: {
+                cart_products: {
+                    productId
+                }
+            }
+        }
+
+        const deleteCartItem = await cartModel.updateOne(query, updateSet)
+
+        return deleteCartItem
+    }
 
 }
 

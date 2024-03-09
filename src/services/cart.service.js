@@ -58,7 +58,7 @@ class CartService {
 
     static async getToCart(payload) {
         return await cartModel.findOne({
-            cart_userId: parseInt(payload.userId)
+            cart_userId: payload.userId
         }).lean();
     }
 
@@ -66,7 +66,6 @@ class CartService {
     // END REPO SERVICE
     static async addToCart(payload) {
         const { userId, product = {} } = payload;
-
         // Kiểm tra xem giỏ hàng đã tồn tại hay chưa ?
         const userCart = await cartModel.findOne({
             cart_userId: userId
@@ -103,13 +102,6 @@ class CartService {
 
             return await userCart.save();
         }
-
-        console.log({
-            userCart
-        })
-
-
-
     }
 
 

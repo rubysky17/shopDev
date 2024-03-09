@@ -120,10 +120,29 @@ const updateProductById = async ({
 };
 
 const findProductItem = async (product_id) => {
-  const products = await Product.findOne(product_id).lean();
+  const products = await Product.findOne({
+    _id: product_id
+  }).lean();
 
   return products;
 };
+
+const verifyProductsWithCheckout = async (products) => {
+  return await Promise.all(products.map(async (product) => {
+    const foundProduct = await findProductItem(product.productId);
+    console.log({
+      foundProduct
+    })
+    if (foundProduct) {
+      return {
+        price: foundProduct.product_price,
+        quantity: product.quantity,
+        productId: product.productId
+      }
+    }
+  }))
+};
+
 module.exports = {
   findAllDraftsForShop,
   publishProductByShop,
@@ -133,5 +152,6 @@ module.exports = {
   findAllProducts,
   findProduct,
   updateProductById,
-  findProductItem
+  findProductItem,
+  verifyProductsWithCheckout
 };

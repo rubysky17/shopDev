@@ -32,7 +32,7 @@ let cartschema = new Schema(
             default: 0,
         },
         cart_userId: {
-            type: Number,
+            type: String,
             required: true
         }
     },

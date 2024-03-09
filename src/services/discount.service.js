@@ -78,9 +78,7 @@ class DiscountService {
         }
 
         const { discount_applies_to, discount_product_ids } = foundDiscount;
-        console.log({
-            discount_applies_to, discount_product_ids
-        })
+
         if (discount_applies_to === "all") {
             products = await findAllProducts({
                 filter: {
@@ -93,7 +91,6 @@ class DiscountService {
                 select: ['product_name']
             });
         }
-
 
         if (discount_applies_to === "specific") {
             products = await findAllProducts({
@@ -145,7 +142,18 @@ class DiscountService {
             throw new NotFoundError("Discount code not exist!")
         }
 
-        const { discount_is_active, discount_users_used, discount_start_date, discount_end_date, discount_min_order_value, discount_max_uses_per_user, discount_type, discount_value } = foundDiscount;
+        const {
+            discount_is_active,
+            discount_users_used,
+            discount_start_date,
+            discount_end_date,
+            discount_min_order_value,
+            discount_max_uses_per_user,
+            discount_type,
+            discount_value,
+            discount_applies_to,
+            discount_product_ids
+        } = foundDiscount;
 
         if (!discount_is_active) throw new NotFoundError("Discount experied!!");
 
@@ -155,15 +163,24 @@ class DiscountService {
         const end_date_discount = new Date(discount_end_date)
 
         if (Date.now() < start_date_discount.getTime() || Date.now() > end_date_discount.getTime()) throw new NotFoundError("Discount experied");
-
+        console.log({
+            products
+        })
 
         // Tính tổng gía trị đơn hàng
         let totalOrders = products.reduce((acc, product) => {
             // * Kiểm tra xem product đó có được nằm trong điều kiện giảm giá của voucher hay không ???
+            if (discount_applies_to === "specific") {
+                if (discount_product_ids.includes(product.productId)) {
+                    return acc + (product.product_quantity * product.product_price)
+                } else {
+                    return acc
+                }
+            } else {
+                // số lượng nhân đơn giá
+                return acc + (product.product_quantity * product.product_price)
+            }
 
-
-            // số lượng nhân đơn giá
-            return acc + (product.product_quantity * product.product_price)
         }, 0);
 
 
@@ -183,7 +200,11 @@ class DiscountService {
 
         // * giá trị giảm giá
         const amountDiscount = discount_type === 'fixed_amount' ? discount_value : totalOrders * (discount_value / 100);
-
+        console.log({
+            totalAmountOrder: totalOrders,
+            discount: amountDiscount,
+            totalPrice: totalOrders - amountDiscount
+        })
         return {
             totalAmountOrder: totalOrders,
             discount: amountDiscount,

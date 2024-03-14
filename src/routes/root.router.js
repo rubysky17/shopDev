@@ -5,6 +5,7 @@ const productRouter = require("./product.router");
 const discountRouter = require("./discount.router");
 const cartRouter = require("./cart.router");
 const checkoutRouter = require("./checkout.router");
+const orderRouter = require("./order.router");
 
 // const { apiKey, permission } = require("../auth/checkAuth.utils");
 
@@ -17,5 +18,6 @@ rootRouter.use("/products", productRouter);
 rootRouter.use("/cart", cartRouter);
 rootRouter.use("/discount", discountRouter);
 rootRouter.use("/checkout", checkoutRouter);
+rootRouter.use("/order", orderRouter);
 
 module.exports = rootRouter;

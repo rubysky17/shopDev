@@ -35,11 +35,13 @@ Còn nữa...
 3. int (Int) - Số nguyên
 
 - VD: 
-js`SET str <Chuỗi gồm 44 ký tự>
+```javascript
+SET str <Chuỗi gồm 44 ký tự>
 object encoding str // => embstr
 
 SET str1 <Chuỗi lớn hơn 44 ký tự>
 object encoding str1 // => raw
 
 SET num <dãy số int>
-object encoding num // => int`
+object encoding num // => int
+```

@@ -69,3 +69,19 @@ MGET <key1>:<property1> <key2>:<property2> // get giá trị theo thuộc tính
 ``` 
 **Nên sử dụng String cho nghiệp vụ đếm hoặc tính số lượng: Đếm likes, đếm bài viết,....**
 
+# Hash
+**Có thể lưu trữ nhiều trường, nhiều kiểu dữ liệu khác nhau. Ưu tiên lưu trữ Object**
+
+```javascript
+HSET <key> <property1> <value1> <property2> <value2> .... // SET key cho nhiều property với nhiều value
+HGET <key> <tên property1> // GET giá trị của property của key
+HMSET <key> <property1> <value1> <property2> <value2> .... // SET key cho nhiều property với nhiều value
+HMGET <key> <tên property1> <tên property2> // GET giá trị của property của key
+HDEL <key> <tên property1> // Xoá 1 trường của key
+HLEN <key> // trả về giá trị độ dài của key
+HGETALL <key> // Trả về tất cả các trường của key
+HEXISTS <key> // Kiểm tra tồn tại
+HINCRBY <key> <tên property1> <value> // Tăng giá trị của trường
+HKEYS <key> // trả về tất cả thuộc tính của key
+HVALS <key> // trả về tất cả giá trị của key
+```

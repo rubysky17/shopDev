@@ -45,3 +45,27 @@ object encoding str1 // => raw
 SET num <dãy số int>
 object encoding num // => int
 ```
+
+**Các lệnh thao tác với String**
+```javascript
+SET <key> <value> // gán giá trị cho key
+GET <key> // lấy giá trị theo key
+EXISTS <key> // Kiểm tra key có tồn tại hay không ? 0 là không tồn tại, 1 là tồn tại
+STRLEN <key> // Kiểm tra độ dài của String
+DEL <key> // Xoá key => 1 xoá thành công, 0 xoá thất bại
+MSET <key1> <value1> <key2> <value2> // Gán hàng loạt
+MGET <key1> <key2>  // Lấy hàng loạt
+INCR <key> // Tăng giá trị của key lên 1
+INCRBY <key> <value> // Tăng giá trị của key cộng với <value>
+DECR <key> // Giảm giá trị của key lên 1
+DECRBY <key> <value> // Giảm giá trị của key trừ thêm <value>
+KEYS '<key>*' // Tìm kiếm tất cả các key
+EXPIRE <key> <value> // Set thời gian key hết hạn theo <value> (đơn vị là giây)
+TTL <key> // Trả về thời gian key còn sống (đơn vị là giây)
+SET <key> <value> EX <time> // Set giá trị và set time expire
+SETNX <key> <value1> // Nếu key tồn tại thì sẽ không set
+MSET <key1>:<property1> <value1> <key2>:<property2> <value2> // set giá trị theo thuộc tính
+MGET <key1>:<property1> <key2>:<property2> // get giá trị theo thuộc tính
+``` 
+**Nên sử dụng String cho nghiệp vụ đếm hoặc tính số lượng: Đếm likes, đếm bài viết,....**
+

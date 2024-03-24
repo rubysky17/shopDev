@@ -85,3 +85,22 @@ HINCRBY <key> <tên property1> <value> // Tăng giá trị của trường
 HKEYS <key> // trả về tất cả thuộc tính của key
 HVALS <key> // trả về tất cả giá trị của key
 ```
+
+# List
+```javascript
+LSET <key> <index> <value> // Sửa giá trị index
+LPUSH <key> <value1> <value2> <value3> // Left push
+RPUSH <key> <value1> <value2> <value3> // Right push
+LPOP <key> <?value> // Xoá phần từ ngoài cùng bên trái đầu tiên (nếu có value thì sẽ xoá theo số phần tử)
+RPOP <key> <?value> // Xoá phần từ ngoài cùng bên phải đầu tiên (nếu có value thì sẽ xoá theo số phần tử)
+LRANGE <start> <end> // Lấy danh sách end = -1 là lấy all
+LINDEX <key> <index> // Lấy giá trị theo index
+LLEN <key> // Lấy độ dài
+LREM <key> <index> <value> // Xoá phần tử index với value trong key
+LTRIM <key> <start> <stop> // Giống splice trong js
+```
+
+**Blocking trong redis**
+```javascript
+BLPOP <key> <value> // Block lại những hành động đồng thời của user (Khi 2 user hoặc nhiều user cùng trigger 1 hành động thì Block cho phép hành động sau sẽ đợi khi nào người trước thực thi thì sẽ thực thi hành động sau)
+```
